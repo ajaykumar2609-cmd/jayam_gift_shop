@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from pymongo import MongoClient
 from bson import ObjectId
-import os, datetime, random, uuid, hashlib
+import os, datetime, random, uuid, hashlib, jwt
 
 app = Flask(__name__)
 app.secret_key = "jaya_secret_2024"
@@ -65,44 +65,77 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated
 
+def token_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get("Authorization")
+        if not token: return jsonify({"error": "No token"}), 401
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            request.user_id = data["user_id"]
+        except:
+            return jsonify({"error": "Invalid token"}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+def admin_token_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get("Authorization")
+        if not token: return jsonify({"error": "No token"}), 401
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            u = users_col.find_one({"_id": ObjectId(data["user_id"])})
+            if not u or u["role"] != "admin": return jsonify({"error": "Admin required"}), 403
+            request.user_id = data["user_id"]
+        except:
+            return jsonify({"error": "Invalid token"}), 401
+        return f(*args, **kwargs)
+    return decorated
+
 # ── Seed ──────────────────────────────────────────────
 def seed():
-    if products_col.count_documents({}) == 0:
-        products_col.insert_many([
-            {"name":"Botanical Candle",    "emoji":"🕯️","desc":"Hand-poured soy wax with lavender & bergamot. Burns for 50+ hours.","price":28,"category":"wellness",   "tag":"popular","bg":"#fef3e2","stock":42},
-            {"name":"Linen Throw",         "emoji":"🧣", "desc":"Stonewashed French linen in dusty sage. Lightweight and luxurious.","price":64,"category":"home",       "tag":"new",    "bg":"#edf4ef","stock":18},
-            {"name":"Artisan Tea Set",     "emoji":"🍵", "desc":"Six hand-blended teas in a keepsake box with a cast-iron infuser.", "price":42,"category":"food",       "tag":"popular","bg":"#fdf1e8","stock":35},
-            {"name":"Leather Journal",     "emoji":"📔", "desc":"Full-grain vegetable-tanned leather. 240 pages of thick ivory paper.","price":38,"category":"stationery","tag":"",      "bg":"#f0ebe3","stock":27},
-            {"name":"Pressed Flower Print","emoji":"🌸", "desc":"Original botanical illustration, archival giclée print on 300gsm.","price":52,"category":"home",       "tag":"new",    "bg":"#fce8f1","stock":12},
-            {"name":"Bath Ritual Kit",     "emoji":"🛁", "desc":"Dead Sea salts, rose oil, and a wooden bath tray. Pure indulgence.","price":56,"category":"wellness",   "tag":"popular","bg":"#e8f0fe","stock":20},
-            {"name":"Spiced Chocolate Box","emoji":"🍫", "desc":"Twelve single-origin dark chocolates with unexpected spice pairings.","price":22,"category":"food",      "tag":"sale",   "bg":"#fdf1e8","stock":55,"sale_price":18},
-            {"name":"Silk Eye Mask",       "emoji":"😴", "desc":"22 momme mulberry silk, adjustable strap. Sleep like royalty.",    "price":34,"category":"accessories","tag":"new",    "bg":"#ede0f5","stock":30},
-            {"name":"Wildflower Honey",    "emoji":"🍯", "desc":"Raw, unfiltered honey from alpine meadows. A jar of pure sunshine.","price":18,"category":"food",      "tag":"",       "bg":"#fef3cc","stock":60},
-            {"name":"Ceramic Mug Set",     "emoji":"☕", "desc":"Set of two hand-thrown mugs in a warm speckled glaze.",            "price":46,"category":"home",       "tag":"popular","bg":"#f5ede0","stock":22},
-            {"name":"Gratitude Cards",     "emoji":"💌", "desc":"50 beautifully illustrated prompt cards to deepen connections.",   "price":16,"category":"stationery","tag":"",       "bg":"#fff0f0","stock":80},
-            {"name":"Gold Ear Cuff Set",   "emoji":"✨", "desc":"Three mismatched 14k gold-plated cuffs. No piercing required.",    "price":44,"category":"accessories","tag":"sale",   "bg":"#fdf8e1","stock":16,"sale_price":34},
-        ])
-    def ensure_user(email, name, password, role):
-        user = users_col.find_one({"email": email})
-        if not user:
-            users_col.insert_one({
-                "name": name,
-                "email": email,
-                "password": hash_pw(password),
-                "role": role,
-                "created_at": datetime.datetime.utcnow(),
-            })
-        elif user.get("role") != role or user.get("password") != hash_pw(password):
-            users_col.update_one({"_id": user["_id"]}, {"$set": {
-                "name": name,
-                "password": hash_pw(password),
-                "role": role,
-            }})
+    try:
+        if products_col.count_documents({}) == 0:
+            products_col.insert_many([
+                {"name":"Botanical Candle",    "emoji":"🕯️","desc":"Hand-poured soy wax with lavender & bergamot. Burns for 50+ hours.","price":28,"category":"wellness",   "tag":"popular","bg":"#fef3e2","stock":42},
+                {"name":"Linen Throw",         "emoji":"🧣", "desc":"Stonewashed French linen in dusty sage. Lightweight and luxurious.","price":64,"category":"home",       "tag":"new",    "bg":"#edf4ef","stock":18},
+                {"name":"Artisan Tea Set",     "emoji":"🍵", "desc":"Six hand-blended teas in a keepsake box with a cast-iron infuser.", "price":42,"category":"food",       "tag":"popular","bg":"#fdf1e8","stock":35},
+                {"name":"Leather Journal",     "emoji":"📔", "desc":"Full-grain vegetable-tanned leather. 240 pages of thick ivory paper.","price":38,"category":"stationery","tag":"",      "bg":"#f0ebe3","stock":27},
+                {"name":"Pressed Flower Print","emoji":"🌸", "desc":"Original botanical illustration, archival giclée print on 300gsm.","price":52,"category":"home",       "tag":"new",    "bg":"#fce8f1","stock":12},
+                {"name":"Bath Ritual Kit",     "emoji":"🛁", "desc":"Dead Sea salts, rose oil, and a wooden bath tray. Pure indulgence.","price":56,"category":"wellness",   "tag":"popular","bg":"#e8f0fe","stock":20},
+                {"name":"Spiced Chocolate Box","emoji":"🍫", "desc":"Twelve single-origin dark chocolates with unexpected spice pairings.","price":22,"category":"food",      "tag":"sale",   "bg":"#fdf1e8","stock":55,"sale_price":18},
+                {"name":"Silk Eye Mask",       "emoji":"😴", "desc":"22 momme mulberry silk, adjustable strap. Sleep like royalty.",    "price":34,"category":"accessories","tag":"new",    "bg":"#ede0f5","stock":30},
+                {"name":"Wildflower Honey",    "emoji":"🍯", "desc":"Raw, unfiltered honey from alpine meadows. A jar of pure sunshine.","price":18,"category":"food",      "tag":"",       "bg":"#fef3cc","stock":60},
+                {"name":"Ceramic Mug Set",     "emoji":"☕", "desc":"Set of two hand-thrown mugs in a warm speckled glaze.",            "price":46,"category":"home",       "tag":"popular","bg":"#f5ede0","stock":22},
+                {"name":"Gratitude Cards",     "emoji":"💌", "desc":"50 beautifully illustrated prompt cards to deepen connections.",   "price":16,"category":"stationery","tag":"",       "bg":"#fff0f0","stock":80},
+                {"name":"Gold Ear Cuff Set",   "emoji":"✨", "desc":"Three mismatched 14k gold-plated cuffs. No piercing required.",    "price":44,"category":"accessories","tag":"sale",   "bg":"#fdf8e1","stock":16,"sale_price":34},
+            ])
+        def ensure_user(email, name, password, role):
+            user = users_col.find_one({"email": email})
+            if not user:
+                users_col.insert_one({
+                    "name": name,
+                    "email": email,
+                    "password": hash_pw(password),
+                    "role": role,
+                    "created_at": datetime.datetime.utcnow(),
+                })
+            elif user.get("role") != role or user.get("password") != hash_pw(password):
+                users_col.update_one({"_id": user["_id"]}, {"$set": {
+                    "name": name,
+                    "password": hash_pw(password),
+                    "role": role,
+                }})
 
-    ensure_user("admin@jaya.com", "Admin", "admin123", "admin")
-    ensure_user("alice@example.com", "Alice", "alice123", "user")
-    ensure_user("bob@example.com", "Bob", "bob123", "user")
-    print("✅ Seeded products + users")
+        ensure_user("admin@jaya.com", "Admin", "admin123", "admin")
+        ensure_user("alice@example.com", "Alice", "alice123", "user")
+        ensure_user("bob@example.com", "Bob", "bob123", "user")
+        print("✅ Seeded products + users")
+    except Exception as e:
+        print(f"❌ Seeding failed: {e}")
 
 # ── Auth Pages ─────────────────────────────────────────
 @app.route("/login")
@@ -129,9 +162,10 @@ def login():
     d = request.json
     u = users_col.find_one({"email": d["email"], "password": hash_pw(d["password"])})
     if not u: return jsonify({"error": "Invalid email or password"}), 401
-    session["user_id"] = str(u["_id"])
+    token = jwt.encode({"user_id": str(u["_id"]), "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)}, app.secret_key, algorithm="HS256")
+    session["user_id"] = str(u["_id"])  # for pages
     redirect_url = "/admin" if u["role"] == "admin" else "/user"
-    return jsonify({"success": True, "redirect": redirect_url, "role": u["role"]})
+    return jsonify({"success": True, "redirect": redirect_url, "role": u["role"], "token": token})
 
 @app.route("/api/auth/logout", methods=["POST"])
 def logout():
@@ -140,10 +174,21 @@ def logout():
 
 @app.route("/api/auth/me")
 def me():
-    u = current_user()
-    if not u: return jsonify({"error": "Not logged in"}), 401
-    u.pop("password", None)
-    return jsonify(u)
+    token = request.headers.get("Authorization")
+    if not token:
+        u = current_user()
+        if not u: return jsonify({"error": "Not logged in"}), 401
+        return jsonify(u)
+    try:
+        data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+        uid = data["user_id"]
+        u = users_col.find_one({"_id": ObjectId(uid)})
+        if not u: return jsonify({"error": "User not found"}), 401
+        u = serialize(u)
+        u.pop("password", None)
+        return jsonify(u)
+    except:
+        return jsonify({"error": "Invalid token"}), 401
 
 # ── Shop ───────────────────────────────────────────────
 @app.route("/")
@@ -155,7 +200,7 @@ def index(): return render_template("index.html")
 def admin_dashboard(): return render_template("admin.html")
 
 @app.route("/api/admin/stats")
-@admin_required
+@admin_token_required
 def admin_stats():
     total_orders   = orders_col.count_documents({})
     total_revenue  = sum(o.get("total", 0) for o in orders_col.find())
@@ -196,26 +241,26 @@ def admin_stats():
     })
 
 @app.route("/api/admin/orders")
-@admin_required
+@admin_token_required
 def admin_orders():
     orders = [serialize(o) for o in orders_col.find().sort("created_at",-1)]
     for o in orders: o["created_at"] = str(o.get("created_at",""))[:19]
     return jsonify(orders)
 
 @app.route("/api/admin/orders/<order_id>/status", methods=["POST"])
-@admin_required
+@admin_token_required
 def update_order_status(order_id):
     status = request.json.get("status")
     orders_col.update_one({"_id": ObjectId(order_id)}, {"$set": {"status": status}})
     return jsonify({"success": True})
 
 @app.route("/api/admin/products")
-@admin_required
+@admin_token_required
 def admin_products():
     return jsonify([serialize(p) for p in products_col.find()])
 
 @app.route("/api/admin/products/add", methods=["POST"])
-@admin_required
+@admin_token_required
 def admin_add_product():
     d = request.json
     pid = products_col.insert_one({
@@ -227,7 +272,7 @@ def admin_add_product():
     return jsonify({"success": True, "id": str(pid)})
 
 @app.route("/api/admin/products/<pid>", methods=["PUT"])
-@admin_required
+@admin_token_required
 def admin_update_product(pid):
     d = request.json
     products_col.update_one({"_id": ObjectId(pid)}, {"$set": {
@@ -238,13 +283,13 @@ def admin_update_product(pid):
     return jsonify({"success": True})
 
 @app.route("/api/admin/products/<pid>", methods=["DELETE"])
-@admin_required
+@admin_token_required
 def admin_delete_product(pid):
     products_col.delete_one({"_id": ObjectId(pid)})
     return jsonify({"success": True})
 
 @app.route("/api/admin/users")
-@admin_required
+@admin_token_required
 def admin_users():
     users = [serialize(u) for u in users_col.find()]
     for u in users:
@@ -259,18 +304,18 @@ def admin_users():
 def user_dashboard(): return render_template("user.html")
 
 @app.route("/api/user/orders")
-@login_required
+@token_required
 def user_orders():
-    u = current_user()
+    u = users_col.find_one({"_id": ObjectId(request.user_id)})
     orders = [serialize(o) for o in orders_col.find({"customer.email": u["email"]}).sort("created_at",-1)]
     for o in orders: o["created_at"] = str(o.get("created_at",""))[:19]
     return jsonify(orders)
 
 @app.route("/api/user/profile", methods=["PUT"])
-@login_required
+@token_required
 def update_profile():
     d = request.json
-    uid = session["user_id"]
+    uid = request.user_id
     upd = {"name": d["name"], "email": d["email"]}
     if d.get("password"):
         upd["password"] = hash_pw(d["password"])
@@ -307,8 +352,19 @@ def get_related_products(pid):
 # ── Cart ───────────────────────────────────────────────
 @app.route("/api/cart")
 def get_cart():
-    sid = get_session_id()
-    items = list(cart_col.find({"session_id":sid}))
+    token = request.headers.get("Authorization")
+    user_id = None
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            user_id = data["user_id"]
+        except:
+            pass
+    if user_id:
+        items = list(cart_col.find({"user_id": user_id}))
+    else:
+        sid = get_session_id()
+        items = list(cart_col.find({"session_id":sid}))
     result = []
     for item in items:
         p = products_col.find_one({"_id":ObjectId(item["product_id"])})
@@ -319,30 +375,80 @@ def get_cart():
 
 @app.route("/api/cart/add", methods=["POST"])
 def add_to_cart():
-    pid = request.json.get("product_id"); sid = get_session_id()
-    ex  = cart_col.find_one({"session_id":sid,"product_id":pid})
-    if ex: cart_col.update_one({"_id":ex["_id"]},{"$inc":{"qty":1}})
-    else:  cart_col.insert_one({"session_id":sid,"product_id":pid,"qty":1})
+    pid = request.json.get("product_id")
+    token = request.headers.get("Authorization")
+    user_id = None
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            user_id = data["user_id"]
+        except:
+            pass
+    if user_id:
+        ex = cart_col.find_one({"user_id": user_id, "product_id":pid})
+        if ex: cart_col.update_one({"_id":ex["_id"]},{"$inc":{"qty":1}})
+        else: cart_col.insert_one({"user_id": user_id, "product_id":pid,"qty":1})
+    else:
+        sid = get_session_id()
+        ex = cart_col.find_one({"session_id":sid,"product_id":pid})
+        if ex: cart_col.update_one({"_id":ex["_id"]},{"$inc":{"qty":1}})
+        else: cart_col.insert_one({"session_id":sid,"product_id":pid,"qty":1})
     return jsonify({"success":True})
 
 @app.route("/api/cart/update", methods=["POST"])
 def update_cart():
-    d=request.json; sid=get_session_id(); qty=int(d.get("qty",1))
-    if qty<=0: cart_col.delete_one({"_id":ObjectId(d["cart_id"]),"session_id":sid})
-    else: cart_col.update_one({"_id":ObjectId(d["cart_id"]),"session_id":sid},{"$set":{"qty":qty}})
+    d=request.json; qty=int(d.get("qty",1))
+    token = request.headers.get("Authorization")
+    user_id = None
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            user_id = data["user_id"]
+        except:
+            pass
+    if user_id:
+        if qty<=0: cart_col.delete_one({"_id":ObjectId(d["cart_id"]),"user_id":user_id})
+        else: cart_col.update_one({"_id":ObjectId(d["cart_id"]),"user_id":user_id},{"$set":{"qty":qty}})
+    else:
+        sid = get_session_id()
+        if qty<=0: cart_col.delete_one({"_id":ObjectId(d["cart_id"]),"session_id":sid})
+        else: cart_col.update_one({"_id":ObjectId(d["cart_id"]),"session_id":sid},{"$set":{"qty":qty}})
     return jsonify({"success":True})
 
 @app.route("/api/cart/remove", methods=["POST"])
 def remove_from_cart():
-    sid=get_session_id()
-    cart_col.delete_one({"_id":ObjectId(request.json["cart_id"]),"session_id":sid})
+    token = request.headers.get("Authorization")
+    user_id = None
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            user_id = data["user_id"]
+        except:
+            pass
+    if user_id:
+        cart_col.delete_one({"_id":ObjectId(request.json["cart_id"]),"user_id":user_id})
+    else:
+        sid=get_session_id()
+        cart_col.delete_one({"_id":ObjectId(request.json["cart_id"]),"session_id":sid})
     return jsonify({"success":True})
 
 # ── Orders (public) ────────────────────────────────────
 @app.route("/api/orders", methods=["POST"])
 def place_order():
-    d=request.json; sid=get_session_id()
-    items=list(cart_col.find({"session_id":sid}))
+    d=request.json
+    token = request.headers.get("Authorization")
+    user_id = None
+    if token:
+        try:
+            data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+            user_id = data["user_id"]
+        except:
+            pass
+    if user_id:
+        items = list(cart_col.find({"user_id": user_id}))
+    else:
+        sid = get_session_id()
+        items = list(cart_col.find({"session_id":sid}))
     if not items: return jsonify({"error":"Cart empty"}),400
     order_items=[]; total=0
     for item in items:
@@ -354,7 +460,13 @@ def place_order():
             products_col.update_one({"_id":p["_id"]},{"$inc":{"stock":-item["qty"]}})
     num="JAYA-"+str(random.randint(10000,99999))
     orders_col.insert_one({"order_number":num,"customer":d.get("customer",{}),"items":order_items,"total":total,"status":"confirmed","created_at":datetime.datetime.utcnow()})
-    cart_col.delete_many({"session_id":sid})
+    if user_id:
+        cart_col.delete_many({"user_id": user_id})
+    else:
+        cart_col.delete_many({"session_id":sid})
     return jsonify({"success":True,"order_number":num,"total":total})
 
 seed()
+
+# Vercel WSGI handler
+from vercel_python_wsgi import handler
