@@ -6,7 +6,7 @@ import os, datetime, random, uuid, hashlib
 app = Flask(__name__)
 app.secret_key = "jaya_secret_2024"
 
-MONGO_URI    = os.environ.get("MONGO_URI", "mongodb+srv://ajaykumardeveloper12_db_user:Momdad%40223@ajay.cfzt5ua.mongodb.net/?appName=ajay")
+MONGO_URI    = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
 client       = MongoClient(MONGO_URI)
 db           = client["jaya_giftshop"]
 products_col = db["products"]
