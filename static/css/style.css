@@ -158,7 +158,8 @@ body {
 .hero-orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, #7a9e8c 0%, transparent 70%); top: 40%; left: 40%; animation-delay: -5s; opacity: .2; }
 #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .4; }
 
-.hero-content { position: relative; z-index: 2; text-align: center; padding: 0 2rem; max-width: 800px; }
+#shop-page { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+.hero-content { position: relative; z-index: 2; text-align: left; padding: 0 1rem; max-width: 760px; margin: 0 auto; }
 .hero-eyebrow { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; animation: fadeUp .6s var(--ease-out) 2.9s both; }
 .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 300; line-height: 1.1; color: var(--cream); display: flex; flex-direction: column; gap: .1em; margin-bottom: 1.5rem; }
 .hero-line { display: block; animation: heroLineIn .8s var(--ease-out) both; }
@@ -188,6 +189,8 @@ body {
 .filters { padding: 1.5rem 2rem; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: white; border-bottom: 1px solid var(--sand); position: sticky; top: 64px; z-index: 50; }
 .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
 .filter-btn { border: 1.5px solid var(--sand); background: white; color: var(--ink-mid); border-radius: 100px; padding: 7px 18px; font-size: .82rem; cursor: pointer; transition: all .25s var(--ease-out); font-family: 'DM Sans', sans-serif; }
+.filters { justify-content: space-between; }
+.search-wrap { margin-left: auto; width: min(320px, 100%); }
 .filter-btn:hover { border-color: var(--gold); color: var(--gold-dark); transform: translateY(-1px); }
 .filter-btn.active { background: var(--ink); border-color: var(--ink); color: var(--gold); }
 .search-wrap { margin-left: auto; position: relative; display: flex; align-items: center; }
@@ -196,8 +199,8 @@ body {
 .search-input:focus { border-color: var(--gold); width: 240px; box-shadow: 0 0 0 3px var(--gold-glow); }
 
 /* ── PRODUCTS ────────────────────────────────────────── */
-.products-section { padding: 2rem; }
-.section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 1.5rem; }
+.products-section { padding: 2rem; max-width: 1280px; margin: 0 auto; }
+.section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 1.5rem; justify-content: space-between; flex-wrap: wrap; }
 .section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 400; color: var(--ink-mid); }
 .product-count { font-size: .8rem; color: var(--ink-light); }
 
@@ -206,11 +209,13 @@ body {
 @keyframes skeletonShimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
 .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 1.5rem; }
-.product-card { background: white; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--sand); cursor: pointer; transition: transform .35s var(--ease-out), box-shadow .35s var(--ease-out); animation: cardIn .5s var(--ease-out) both; position: relative; }
+.product-card { background: white; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--sand); cursor: pointer; transition: transform .35s var(--ease-out), box-shadow .35s var(--ease-out); animation: cardIn .5s var(--ease-out) both; position: relative; display: flex; flex-direction: column; }
 .product-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: var(--shadow-lg); }
 .product-card:hover .product-img-emoji { transform: scale(1.15) rotate(-5deg); }
 .product-card:hover .add-btn { opacity: 1; transform: translateY(0); }
 .product-card:hover .card-overlay { opacity: 1; }
+.product-info { padding: 1rem 1rem .75rem; display: flex; flex-direction: column; justify-content: space-between; }
+.product-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 @keyframes cardIn { from { opacity: 0; transform: translateY(30px) scale(.96); } to { opacity: 1; transform: none; } }
 
 .product-img { height: 190px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
