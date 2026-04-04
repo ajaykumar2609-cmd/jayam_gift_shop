@@ -9,6 +9,13 @@ app.secret_key = "jaya_secret_2024"
 MONGO_URI    = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
 client       = MongoClient(MONGO_URI)
 db           = client["jaya_giftshop"]
+try:
+    client.admin.command('ping')
+    print("✅ Connected to MongoDB")
+except Exception as e:
+    print(f"❌ MongoDB connection failed: {e}")
+    print("Please ensure MongoDB is running locally or set MONGO_URI environment variable to a valid Atlas connection string.")
+
 products_col = db["products"]
 orders_col   = db["orders"]
 cart_col     = db["carts"]
