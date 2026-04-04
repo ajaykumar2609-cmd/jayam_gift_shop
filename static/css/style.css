@@ -215,6 +215,9 @@ body {
 
 .product-img { height: 190px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
 .product-img-emoji { font-size: 4.5rem; transition: transform .4s var(--ease-spring); position: relative; z-index: 1; }
+.product-card-cart { position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.95); color: var(--ink); display: flex; align-items: center; justify-content: center; z-index: 3; box-shadow: 0 14px 32px rgba(28,20,16,.12); transition: transform .2s var(--ease-out), background .2s; }
+.product-card:hover .product-card-cart { transform: translateY(-2px); background: white; }
+.product-card-cart i { font-size: 0.95rem; }
 .card-overlay { position: absolute; inset: 0; background: rgba(28,20,16,0.06); opacity: 0; transition: opacity .3s; }
 .product-tag { position: absolute; top: 10px; left: 10px; font-size: 10px; font-weight: 500; padding: 4px 10px; border-radius: 100px; text-transform: uppercase; letter-spacing: .08em; z-index: 2; }
 .tag-new     { background: var(--sage); color: white; }

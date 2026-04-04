@@ -7,6 +7,7 @@
 <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
 <title>Jayam Gift Shop</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-Pi7vE+s6jT0xDkKLXjP7x4orV5rKx6Ex8SAGfi5LoAO1xxR1rcbjbUW+q3W5XzghVcDga5R6n3S0zJ9YhOaNSw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -39,7 +40,7 @@
     <a href="/login" id="nav-login-btn" style="color:var(--sand);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--sand)'">Sign In</a>
     <a href="/user" id="nav-account-btn" style="display:none;color:var(--sand);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--sand)'">My Account</a>
     <button class="cart-btn" onclick="toggleCart()">
-      <span class="cart-icon">🛍</span>
+      <span class="cart-icon"><i class="fa-solid fa-cart-shopping"></i></span>
       <span class="cart-label">Cart</span>
       <span class="badge" id="cart-count">0</span>
       <span class="cart-ripple"></span>

@@ -122,6 +122,7 @@ function renderProducts(products) {
         <div class="product-img" style="background:${p.bg}">
           <span class="product-img-emoji">${p.emoji}</span>
           <div class="card-overlay"></div>
+          <span class="product-card-cart"><i class="fa-solid fa-cart-plus"></i></span>
           ${p.tag ? `<span class="product-tag tag-${p.tag}">${p.tag}</span>` : ''}
         </div>
         <div class="product-info">
@@ -129,7 +130,7 @@ function renderProducts(products) {
           <div class="product-desc">${p.desc.slice(0,62)}…</div>
           <div class="product-footer">
             <div class="price">${CURRENCY}${dp}${p.sale_price ? `<span class="price-original">${CURRENCY}${p.price}</span>` : ''}</div>
-            <button class="add-btn" onclick="event.stopPropagation();addToCart('${p._id}','${p.name}','${p.emoji}')">+</button>
+            <button class="add-btn" onclick="event.stopPropagation();addToCart('${p._id}','${p.name}','${p.emoji}')"><i class="fa-solid fa-cart-plus"></i></button>
           </div>
         </div>
       </div>`;
@@ -192,7 +193,7 @@ function renderCart() {
   const footer = document.getElementById('cart-footer');
   if(!items) return;
   if(!cartData.length) {
-    items.innerHTML=`<div class="cart-empty"><div class="empty-icon">🛍️</div><p style="margin-bottom:.5rem">Your cart is empty.</p><p style="font-size:.8rem;color:var(--ink-light)">Start adding beautiful gifts!</p></div>`;
+    items.innerHTML=`<div class="cart-empty"><div class="empty-icon"><i class="fa-solid fa-cart-shopping"></i></div><p style="margin-bottom:.5rem">Your cart is empty.</p><p style="font-size:.8rem;color:var(--ink-light)">Start adding beautiful gifts!</p></div>`;
     if(footer) footer.style.display='none'; return;
   }
   if(footer) footer.style.display='block';
