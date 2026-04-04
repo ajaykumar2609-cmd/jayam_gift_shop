@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.secret_key = "jaya_secret_2024"
 
 MONGO_URI    = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
-client       = MongoClient(MONGO_URI)
+client       = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 db           = client["jaya_giftshop"]
 try:
     client.admin.command('ping')
@@ -24,7 +24,18 @@ users_col    = db["users"]
 # ── Helpers ────────────────────────────────────────────
 def hash_pw(pw): return hashlib.sha256(pw.encode()).hexdigest()
 def serialize(doc):
-    doc["_id"] = str(doc["_id"])
+    if not doc:
+        return doc
+    doc = dict(doc)
+    for key, value in list(doc.items()):
+        if isinstance(value, ObjectId):
+            doc[key] = str(value)
+        elif isinstance(value, datetime.datetime):
+            doc[key] = value.isoformat()
+        elif isinstance(value, dict):
+            doc[key] = serialize(value)
+        elif isinstance(value, list):
+            doc[key] = [serialize(item) if isinstance(item, dict) else item for item in value]
     return doc
 def get_session_id():
     if "session_id" not in session:
