@@ -300,6 +300,16 @@ body {
 #modal-qty { font-weight: 500; font-size: 1rem; min-width: 24px; text-align: center; }
 .modal-add { background: var(--ink); color: var(--gold); border: none; border-radius: 10px; padding: 13px 20px; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; cursor: pointer; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background .25s, transform .2s var(--ease-spring), box-shadow .25s; }
 .modal-add:hover { background: var(--ink-mid); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.related-section { margin-top: 1.6rem; }
+.related-title { font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-light); margin-bottom: .9rem; }
+.related-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .85rem; }
+.related-item { display: flex; gap: .75rem; align-items: center; background: rgba(255,255,255,.95); border: 1px solid var(--sand); border-radius: 16px; padding: .85rem; cursor: pointer; transition: transform .2s var(--ease-spring), box-shadow .2s; }
+.related-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.related-item-emoji { width: 42px; height: 42px; border-radius: 14px; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.related-item-info { min-width: 0; }
+.related-item-name { font-size: .92rem; font-weight: 500; color: var(--ink-mid); line-height: 1.2; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.related-item-price { font-size: .84rem; color: var(--gold-dark); }
+.related-loading, .related-empty { color: var(--ink-light); font-size: .85rem; }
 
 /* ── CHECKOUT ────────────────────────────────────────── */
 .checkout-page { padding: 2.5rem; max-width: 900px; margin: 0 auto; }

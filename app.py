@@ -281,6 +281,18 @@ def get_product(pid):
     p = products_col.find_one({"_id": ObjectId(pid)})
     return jsonify(serialize(p)) if p else (jsonify({"error":"Not found"}),404)
 
+@app.route("/api/products/related/<pid>")
+def get_related_products(pid):
+    p = products_col.find_one({"_id": ObjectId(pid)})
+    if not p:
+        return jsonify({"error":"Not found"}), 404
+    related = list(products_col.find({"category": p.get("category"), "_id": {"$ne": p["_id"]}}).limit(4))
+    if len(related) < 4:
+        exclude_ids = [r["_id"] for r in related] + [p["_id"]]
+        extra = list(products_col.find({"_id": {"$nin": exclude_ids}}).limit(4 - len(related)))
+        related.extend(extra)
+    return jsonify([serialize(r) for r in related])
+
 # ── Cart ───────────────────────────────────────────────
 @app.route("/api/cart")
 def get_cart():

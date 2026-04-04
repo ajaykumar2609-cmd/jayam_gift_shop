@@ -246,7 +246,33 @@ async function openModal(productId) {
     const badges=document.getElementById('modal-badges');
     badges.innerHTML=selectedProduct.tag?`<span class="product-tag tag-${selectedProduct.tag}" style="position:static">${selectedProduct.tag}</span>`:'';
     document.getElementById('modal-overlay').classList.add('open');
+    loadRelatedProducts(productId);
   } catch(e){}
+}
+
+async function loadRelatedProducts(productId) {
+  const container = document.getElementById('related-products');
+  if (!container) return;
+  container.innerHTML = '<div class="related-loading">Loading related items…</div>';
+  try {
+    const res = await fetch('/api/products/related/' + productId);
+    const items = await res.json();
+    if (!items || !items.length) {
+      container.innerHTML = '<div class="related-empty">No related gifts found.</div>';
+      return;
+    }
+    container.innerHTML = items.map(item => `
+      <div class="related-item" onclick="openModal('${item._id}')">
+        <div class="related-item-emoji">${item.emoji}</div>
+        <div class="related-item-info">
+          <div class="related-item-name">${item.name}</div>
+          <div class="related-item-price">${CURRENCY}${item.sale_price||item.price}</div>
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = '<div class="related-empty">Unable to load related items.</div>';
+  }
 }
 
 function modalQtyChange(delta){ modalQty=Math.max(1,modalQty+delta); document.getElementById('modal-qty').textContent=modalQty; }
