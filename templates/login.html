@@ -74,8 +74,10 @@ async function doLogin() {
   if (!email || !password) { showErr('Please fill in all fields'); return; }
   const res  = await fetch('/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
   const data = await res.json();
-  if (data.success) window.location.href = data.redirect;
-  else showErr(data.error || 'Login failed');
+  if (data.success) {
+    localStorage.setItem('authToken', data.token);
+    window.location.href = data.redirect;
+  } else showErr(data.error || 'Login failed');
 }
 function showErr(msg) { const e=document.getElementById('err'); e.textContent=msg; e.style.display='block'; }
 document.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });

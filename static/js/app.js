@@ -9,6 +9,7 @@ let selectedProduct = null;
 let modalQty        = 1;
 let activeFilter    = 'all';
 let searchTimer     = null;
+const authToken     = localStorage.getItem('authToken');
 
 // ── Init ────────────────────────────────────────
 window.addEventListener('load', () => {
@@ -159,26 +160,34 @@ function scrollToProducts() {
 
 // ── CART ─────────────────────────────────────────
 async function loadCart() {
-  try { const res=await fetch('/api/cart'); cartData=await res.json(); renderCart(); } catch(e){}
+  const headers = {};
+  if (authToken) headers['Authorization'] = authToken;
+  try { const res=await fetch('/api/cart', { headers }); cartData=await res.json(); renderCart(); } catch(e){}
 }
 
 async function addToCart(productId, name, emoji) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = authToken;
   try {
-    await fetch('/api/cart/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product_id:productId})});
+    await fetch('/api/cart/add',{method:'POST', headers, body:JSON.stringify({product_id:productId})});
     await loadCart(); bumpBadge(); showToast(emoji, `${name} added to cart`);
   } catch(e){ showToast('❌','Could not add item'); }
 }
 
 async function changeQty(cartId, currentQty, delta) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = authToken;
   try {
-    await fetch('/api/cart/update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cart_id:cartId,qty:currentQty+delta})});
+    await fetch('/api/cart/update',{method:'POST', headers, body:JSON.stringify({cart_id:cartId,qty:currentQty+delta})});
     await loadCart();
   } catch(e){}
 }
 
 async function removeItem(cartId) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = authToken;
   try {
-    await fetch('/api/cart/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cart_id:cartId})});
+    await fetch('/api/cart/remove',{method:'POST', headers, body:JSON.stringify({cart_id:cartId})});
     await loadCart();
   } catch(e){}
 }
@@ -305,8 +314,10 @@ async function placeOrder() {
   if(!fname||!email){ showToast('⚠️','Please fill in required fields'); return; }
   const btn=document.querySelector('.submit-btn'), label=document.getElementById('submit-label');
   label.textContent='Placing order…'; btn.disabled=true;
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) headers['Authorization'] = authToken;
   try {
-    const res=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({customer:{first_name:fname,last_name:document.getElementById('lname').value.trim(),email,address:document.getElementById('address').value.trim(),city:document.getElementById('city').value.trim(),zip:document.getElementById('zip').value.trim(),gift_message:document.getElementById('gift-msg').value.trim(),payment:document.getElementById('payment').value}})});
+    const res=await fetch('/api/orders',{method:'POST', headers, body:JSON.stringify({customer:{first_name:fname,last_name:document.getElementById('lname').value.trim(),email,address:document.getElementById('address').value.trim(),city:document.getElementById('city').value.trim(),zip:document.getElementById('zip').value.trim(),gift_message:document.getElementById('gift-msg').value.trim(),payment:document.getElementById('payment').value}})});
     const data=await res.json();
     if(data.success){
       document.getElementById('order-num').textContent='Order #'+data.order_number;
