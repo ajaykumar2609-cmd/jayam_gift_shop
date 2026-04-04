@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Jayam</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#1c1410;--cream:#faf7f2;--warm:#f5ede0;--sand:#e8d8c3;--gold:#c9a96e;--gold-dark:#a07840;--rose:#d4756a;--ease:cubic-bezier(0.22,1,0.36,1)}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.bg{position:fixed;inset:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.3}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,#c9a96e,transparent 70%);top:-150px;right:-100px;animation:float 8s ease-in-out infinite}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,#d4756a,transparent 70%);bottom:-100px;left:-100px;animation:float 7s ease-in-out -3s infinite}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
+.card{background:rgba(250,247,242,.04);backdrop-filter:blur(20px);border:1px solid rgba(201,169,110,.2);border-radius:24px;padding:3rem;width:100%;max-width:420px;position:relative;z-index:1;animation:cardIn .7s var(--ease) both}
+@keyframes cardIn{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:none}}
+.logo{text-align:center;margin-bottom:2rem}
+.logo-l{font-family:'Cormorant Garamond',serif;font-size:2.4rem;color:var(--gold)}
+.logo-rest{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--cream)}
+.logo-tag{display:block;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(201,169,110,.6);margin-top:.25rem}
+h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--cream);text-align:center;margin-bottom:.5rem}
+.sub{text-align:center;font-size:.85rem;color:rgba(250,247,242,.45);margin-bottom:2rem}
+.form-group{margin-bottom:1.2rem}
+label{display:block;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(201,169,110,.7);margin-bottom:6px}
+input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(201,169,110,.2);border-radius:10px;padding:12px 16px;font-size:.95rem;color:var(--cream);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .25s,box-shadow .25s}
+input::placeholder{color:rgba(250,247,242,.25)}
+input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,.15)}
+.btn{width:100%;background:var(--gold);color:var(--ink);border:none;border-radius:10px;padding:14px;font-size:1rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s,transform .15s;margin-top:.5rem}
+.btn:hover{background:#d4b578;transform:translateY(-1px)}
+.btn:active{transform:scale(.98)}
+.divider{text-align:center;color:rgba(250,247,242,.25);font-size:.8rem;margin:1.2rem 0;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:rgba(201,169,110,.2)}
+.divider::before{left:0}.divider::after{right:0}
+.link-row{text-align:center;font-size:.85rem;color:rgba(250,247,242,.4);margin-top:1.2rem}
+.link-row a{color:var(--gold);text-decoration:none;transition:color .2s}
+.link-row a:hover{color:#d4b578}
+.error-msg{background:rgba(212,117,106,.15);border:1px solid rgba(212,117,106,.3);border-radius:8px;color:#f0a09a;font-size:.84rem;padding:10px 14px;margin-bottom:1rem;display:none}
+.demo-box{background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.15);border-radius:10px;padding:12px 16px;margin-top:1.2rem}
+.demo-box p{font-size:.78rem;color:rgba(201,169,110,.7);margin-bottom:6px;letter-spacing:.05em}
+.demo-row{display:flex;justify-content:space-between;font-size:.8rem}
+.demo-label{color:rgba(250,247,242,.4)}
+.demo-val{color:var(--gold);font-family:monospace}
+</style>
+</head>
+<body>
+<div class="bg"><div class="orb orb1"></div><div class="orb orb2"></div></div>
+<div class="card">
+  <div class="logo">
+    <span class="logo-l">J</span><span class="logo-rest">ayam</span>
+    <span class="logo-tag">Gift Shop</span>
+  </div>
+  <h2>Welcome back</h2>
+  <p class="sub">Sign in to your account</p>
+  <div class="error-msg" id="err"></div>
+  <div class="form-group"><label>Email</label><input type="email" id="email" placeholder="you@example.com" /></div>
+  <div class="form-group"><label>Password</label><input type="password" id="password" placeholder="••••••••" /></div>
+  <button class="btn" onclick="doLogin()">Sign In</button>
+  <div class="divider">or</div>
+  <div class="link-row">New here? <a href="/register">Create an account</a></div>
+  <div class="link-row" style="margin-top:.5rem"><a href="/">← Back to shop</a></div>
+  <div class="demo-box">
+    <p>Demo credentials:</p>
+    <div class="demo-row"><span class="demo-label">Admin:</span><span class="demo-val">admin@jaya.com / admin123</span></div>
+    <div class="demo-row" style="margin-top:4px"><span class="demo-label">User:</span><span class="demo-val">alice@example.com / alice123</span></div>
+  </div>
+</div>
+<script>
+async function doLogin() {
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  if (!email || !password) { showErr('Please fill in all fields'); return; }
+  const res  = await fetch('/api/auth/login', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  const data = await res.json();
+  if (data.success) window.location.href = data.redirect;
+  else showErr(data.error || 'Login failed');
+}
+function showErr(msg) { const e=document.getElementById('err'); e.textContent=msg; e.style.display='block'; }
+document.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>

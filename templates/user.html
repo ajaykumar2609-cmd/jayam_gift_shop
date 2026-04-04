@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — Jayam</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1c1410;--ink-mid:#4a3728;--ink-light:#8c7060;
+  --cream:#faf7f2;--warm:#f5ede0;--sand:#e8d8c3;
+  --gold:#c9a96e;--gold-dark:#a07840;
+  --rose:#d4756a;--sage:#7a9e8c;
+  --sidebar:230px;--ease:cubic-bezier(0.22,1,0.36,1);
+}
+body{font-family:'DM Sans',sans-serif;background:#f4f1ec;color:var(--ink);display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:white;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;border-right:1px solid var(--sand);transition:transform .35s var(--ease)}
+.sidebar-logo{padding:1.4rem 1.4rem 1rem;border-bottom:1px solid var(--sand)}
+.sidebar-logo .l{font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:var(--gold)}
+.sidebar-logo .rest{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;color:var(--ink)}
+.user-header{padding:1.4rem;text-align:center;border-bottom:1px solid var(--sand)}
+.user-big-avatar{width:70px;height:70px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:600;color:var(--ink);margin:0 auto .75rem;font-family:'Cormorant Garamond',serif}
+.user-big-name{font-weight:500;font-size:.95rem;color:var(--ink)}
+.user-big-email{font-size:.78rem;color:var(--ink-light);margin-top:2px}
+.member-badge{display:inline-flex;align-items:center;gap:4px;margin-top:.5rem;background:var(--warm);border:1px solid var(--sand);border-radius:20px;padding:3px 10px;font-size:.72rem;color:var(--gold-dark)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.65rem 1.4rem;color:var(--ink-light);font-size:.88rem;cursor:pointer;transition:color .2s,background .2s;border-left:2px solid transparent;margin:.1rem 0}
+.nav-item:hover{color:var(--ink);background:var(--cream)}
+.nav-item.active{color:var(--gold-dark);border-left-color:var(--gold);background:var(--warm)}
+.nav-icon{font-size:1rem;width:20px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:1rem 1.4rem;border-top:1px solid var(--sand);display:flex;flex-direction:column;gap:.6rem}
+.footer-link{font-size:.83rem;color:var(--ink-light);cursor:pointer;display:flex;align-items:center;gap:8px;transition:color .2s}
+.footer-link:hover{color:var(--ink)}
+.logout-btn{background:none;border:1px solid var(--sand);color:var(--ink-light);border-radius:8px;padding:8px 14px;font-size:.83rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;text-align:left}
+.logout-btn:hover{border-color:var(--rose);color:var(--rose)}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:white;padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--sand);position:sticky;top:0;z-index:50}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400}
+.shop-btn{background:var(--ink);color:var(--gold);border:none;border-radius:8px;padding:8px 18px;font-size:.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s}
+.shop-btn:hover{background:var(--ink-mid)}
+.content{padding:2rem;flex:1}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2rem}
+.stat-card{background:white;border-radius:14px;padding:1.4rem;border:1px solid var(--sand);animation:fadeUp .5s var(--ease) both}
+.stat-icon{font-size:1.8rem;margin-bottom:.6rem}
+.stat-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-light);margin-bottom:.3rem}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--ink)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* PANEL */
+.panel{background:white;border-radius:14px;border:1px solid var(--sand);overflow:hidden;margin-bottom:1.25rem;animation:fadeUp .5s var(--ease) .1s both}
+.panel-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--sand);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400}
+.panel-body{padding:1.4rem}
+
+/* ORDERS */
+.order-card{border:1px solid var(--sand);border-radius:12px;padding:1.2rem;margin-bottom:1rem;transition:box-shadow .2s;background:white}
+.order-card:hover{box-shadow:0 4px 16px rgba(28,20,16,.08)}
+.order-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.order-num{font-weight:500;font-size:.95rem}
+.order-date{font-size:.8rem;color:var(--ink-light)}
+.status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:500}
+.status-confirmed{background:#e8f5ef;color:#2d7a4f}
+.status-shipped{background:#e8f0fe;color:#1a56a0}
+.status-delivered{background:#fef3e2;color:#a07840}
+.status-cancelled{background:#fde8e8;color:#a02d2d}
+.status-pending{background:#f5ede0;color:#8c7060}
+.order-items{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem}
+.order-item-pill{background:var(--warm);border-radius:8px;padding:4px 10px;font-size:.8rem}
+.order-total{font-size:.88rem;color:var(--ink-mid)}
+.order-total strong{color:var(--gold-dark)}
+.empty-state{text-align:center;padding:3rem;color:var(--ink-light)}
+.empty-state .e-icon{font-size:3rem;margin-bottom:1rem}
+
+/* PROFILE FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-light);margin-bottom:6px}
+.form-group input{width:100%;border:1.5px solid var(--sand);background:var(--cream);border-radius:10px;padding:10px 14px;font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s}
+.form-group input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,.12)}
+.save-btn{background:var(--gold);color:var(--ink);border:none;border-radius:10px;padding:11px 28px;font-size:.95rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s,transform .15s}
+.save-btn:hover{background:#d4b578;transform:translateY(-1px)}
+.section{display:none}.section.active{display:block}
+.divider{border:none;border-top:1px solid var(--sand);margin:1.5rem 0}
+.danger-zone{border:1px solid rgba(212,117,106,.3);border-radius:12px;padding:1.2rem}
+.danger-title{font-size:.85rem;color:var(--rose);font-weight:500;margin-bottom:.5rem}
+.danger-desc{font-size:.82rem;color:var(--ink-light);margin-bottom:.75rem}
+.danger-btn{background:none;border:1px solid var(--rose);color:var(--rose);border-radius:8px;padding:7px 16px;font-size:.83rem;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* WISHLIST */
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem}
+.wish-card{border:1px solid var(--sand);border-radius:12px;overflow:hidden;background:white;transition:box-shadow .2s}
+.wish-card:hover{box-shadow:0 4px 14px rgba(28,20,16,.1)}
+.wish-img{height:110px;display:flex;align-items:center;justify-content:center;font-size:3rem}
+.wish-info{padding:.75rem}
+.wish-name{font-size:.88rem;font-weight:500;margin-bottom:2px}
+.wish-price{font-size:.82rem;color:var(--gold-dark)}
+.wish-add{width:100%;background:var(--ink);color:var(--gold);border:none;border-radius:6px;padding:6px;font-size:.8rem;cursor:pointer;margin-top:.5rem;transition:background .2s;font-family:'DM Sans',sans-serif}
+.wish-add:hover{background:var(--ink-mid)}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--ink);color:var(--gold);padding:10px 20px;border-radius:10px;font-size:.88rem;z-index:9999;opacity:0;transform:translateY(12px);transition:all .35s var(--ease);pointer-events:none}
+.toast.show{opacity:1;transform:none}
+
+/* MOBILE */
+.hamburger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:4px;padding:4px}
+.hamburger span{width:20px;height:2px;background:var(--ink);border-radius:2px}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:none}
+  .main{margin-left:0}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .hamburger{display:flex!important}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><span class="l">J</span><span class="rest">ayam</span></div>
+  <div class="user-header">
+    <div class="user-big-avatar" id="user-avatar">U</div>
+    <div class="user-big-name" id="user-name">Loading…</div>
+    <div class="user-big-email" id="user-email"></div>
+    <div class="member-badge">✦ Jayam Member</div>
+  </div>
+  <div class="nav-item active" onclick="showSection('overview',this)"><span class="nav-icon">🏠</span> Overview</div>
+  <div class="nav-item" onclick="showSection('orders',this)"><span class="nav-icon">📦</span> My Orders</div>
+  <div class="nav-item" onclick="showSection('wishlist',this)"><span class="nav-icon">❤️</span> Wishlist</div>
+  <div class="nav-item" onclick="showSection('profile',this)"><span class="nav-icon">👤</span> Profile</div>
+  <div class="sidebar-footer">
+    <div class="footer-link" onclick="window.location.href='/'">🛍 &nbsp;Go to Shop</div>
+    <button class="logout-btn" onclick="logout()">← Sign Out</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+      <div class="page-title" id="page-title">My Account</div>
+    </div>
+    <button class="shop-btn" onclick="window.location.href='/'">Shop Now →</button>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="section active" id="section-overview">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-label">Total Orders</div><div class="stat-value" id="ov-orders">0</div></div>
+        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Total Spent</div><div class="stat-value" id="ov-spent">₹0</div></div>
+        <div class="stat-card"><div class="stat-icon">❤️</div><div class="stat-label">Wishlist Items</div><div class="stat-value" id="ov-wish">0</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Recent Orders</span><span style="font-size:.82rem;color:var(--ink-light);cursor:pointer" onclick="showSection('orders',document.querySelectorAll('.nav-item')[2])">View all →</span></div>
+        <div class="panel-body" id="recent-orders-wrap"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Quick Actions</span></div>
+        <div class="panel-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+          <div onclick="window.location.href='/'" style="border:1px solid var(--sand);border-radius:10px;padding:1rem;text-align:center;cursor:pointer;transition:box-shadow .2s" onmouseover="this.style.boxShadow='0 4px 14px rgba(28,20,16,.1)'" onmouseout="this.style.boxShadow=''">
+            <div style="font-size:1.8rem;margin-bottom:.4rem">🛍</div>
+            <div style="font-size:.88rem;font-weight:500">Browse Shop</div>
+          </div>
+          <div onclick="showSection('orders',document.querySelectorAll('.nav-item')[2])" style="border:1px solid var(--sand);border-radius:10px;padding:1rem;text-align:center;cursor:pointer;transition:box-shadow .2s" onmouseover="this.style.boxShadow='0 4px 14px rgba(28,20,16,.1)'" onmouseout="this.style.boxShadow=''">
+            <div style="font-size:1.8rem;margin-bottom:.4rem">📦</div>
+            <div style="font-size:.88rem;font-weight:500">Track Orders</div>
+          </div>
+          <div onclick="showSection('profile',document.querySelectorAll('.nav-item')[4])" style="border:1px solid var(--sand);border-radius:10px;padding:1rem;text-align:center;cursor:pointer;transition:box-shadow .2s" onmouseover="this.style.boxShadow='0 4px 14px rgba(28,20,16,.1)'" onmouseout="this.style.boxShadow=''">
+            <div style="font-size:1.8rem;margin-bottom:.4rem">⚙️</div>
+            <div style="font-size:.88rem;font-weight:500">Edit Profile</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="section" id="section-orders">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Order History</span></div>
+        <div class="panel-body" id="orders-list"></div>
+      </div>
+    </div>
+
+    <!-- WISHLIST -->
+    <div class="section" id="section-wishlist">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">My Wishlist</span><span style="font-size:.8rem;color:var(--ink-light)" id="wish-count"></span></div>
+        <div class="panel-body">
+          <div class="wish-grid" id="wish-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="section" id="section-profile">
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Personal Information</span></div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <div class="form-group"><label>Full Name</label><input id="p-name" type="text" /></div>
+            <div class="form-group"><label>Email</label><input id="p-email" type="email" /></div>
+          </div>
+          <hr class="divider">
+          <div style="font-size:.85rem;font-weight:500;color:var(--ink-mid);margin-bottom:1rem">Change Password</div>
+          <div class="form-group" style="max-width:340px"><label>New Password</label><input id="p-password" type="password" placeholder="Leave blank to keep current" /></div>
+          <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+          <hr class="divider">
+          <div class="danger-zone">
+            <div class="danger-title">⚠ Danger Zone</div>
+            <div class="danger-desc">Once you delete your account, there is no going back. Please be certain.</div>
+            <button class="danger-btn">Delete Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let userOrders=[], wishlist=[], userInfo={};
+
+const WISHLIST_ITEMS=[
+  {emoji:'🕯️',name:'Botanical Candle',price:28,bg:'#fef3e2'},
+  {emoji:'🌸',name:'Pressed Flower Print',price:52,bg:'#fce8f1'},
+  {emoji:'✨',name:'Gold Ear Cuff Set',price:34,bg:'#fdf8e1'},
+  {emoji:'😴',name:'Silk Eye Mask',price:34,bg:'#ede0f5'},
+];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const me = await fetch('/api/auth/me').then(r=>r.json());
+  if(me.error){window.location.href='/login';return}
+  userInfo = me;
+  document.getElementById('user-avatar').textContent = me.name[0].toUpperCase();
+  document.getElementById('user-name').textContent   = me.name;
+  document.getElementById('user-email').textContent  = me.email;
+  document.getElementById('p-name').value  = me.name;
+  document.getElementById('p-email').value = me.email;
+  document.getElementById('page-title').textContent = 'Welcome, '+me.name.split(' ')[0];
+  await loadOrders();
+  loadWishlist();
+});
+
+async function loadOrders(){
+  userOrders = await fetch('/api/user/orders').then(r=>r.json());
+  const total  = userOrders.length;
+  const spent  = userOrders.reduce((s,o)=>s+(o.total||0),0);
+  document.getElementById('ov-orders').textContent = total;
+  document.getElementById('ov-spent').textContent  = '₹'+spent.toFixed(0);
+  // Recent orders (overview)
+  const wrap = document.getElementById('recent-orders-wrap');
+  if(!userOrders.length){
+    wrap.innerHTML='<div class="empty-state"><div class="e-icon">📭</div><p>No orders yet.</p><p style="font-size:.82rem;margin-top:.5rem">Start shopping to see your orders here!</p></div>';
+  } else {
+    wrap.innerHTML = userOrders.slice(0,3).map(o=>renderOrderCard(o)).join('');
+  }
+  // All orders
+  document.getElementById('orders-list').innerHTML = userOrders.length
+    ? userOrders.map(o=>renderOrderCard(o)).join('')
+    : '<div class="empty-state"><div class="e-icon">📦</div><p>No orders yet.</p></div>';
+}
+
+function renderOrderCard(o){
+  const items = (o.items||[]).map(i=>`<span class="order-item-pill">${i.emoji} ${i.name} ×${i.qty}</span>`).join('');
+  return `<div class="order-card">
+    <div class="order-top">
+      <div>
+        <div class="order-num">${o.order_number||'—'}</div>
+        <div class="order-date">${(o.created_at||'').slice(0,10)}</div>
+      </div>
+      <span class="status-pill status-${o.status||'pending'}">${o.status||'pending'}</span>
+    </div>
+    <div class="order-items">${items}</div>
+    <div class="order-total">Total: <strong>₹${(o.total||0).toFixed(2)}</strong></div>
+  </div>`;
+}
+
+function loadWishlist(){
+  wishlist = WISHLIST_ITEMS;
+  document.getElementById('ov-wish').textContent   = wishlist.length;
+  document.getElementById('wish-count').textContent = wishlist.length+' items';
+  document.getElementById('wish-grid').innerHTML = wishlist.map((w,i)=>`
+    <div class="wish-card">
+      <div class="wish-img" style="background:${w.bg}">${w.emoji}</div>
+      <div class="wish-info">
+        <div class="wish-name">${w.name}</div>
+        <div class="wish-price">₹${w.price}</div>
+        <button class="wish-add" onclick="addToCart('${w.name}','${w.emoji}')">Add to Cart</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addToCart(name, emoji){
+  showToast(emoji+' '+name+' added to cart');
+}
+
+async function saveProfile(){
+  const name=document.getElementById('p-name').value.trim();
+  const email=document.getElementById('p-email').value.trim();
+  const password=document.getElementById('p-password').value;
+  const res=await fetch('/api/user/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})});
+  const d=await res.json();
+  if(d.success){
+    document.getElementById('user-name').textContent=name;
+    document.getElementById('user-avatar').textContent=name[0].toUpperCase();
+    showToast('✅ Profile updated');
+  }
+}
+
+function showSection(name, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  const titles={overview:'My Account',orders:'Order History',wishlist:'My Wishlist',profile:'Profile Settings'};
+  document.getElementById('page-title').textContent=titles[name]||name;
+  if(window.innerWidth<900) toggleSidebar();
+}
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+async function logout(){await fetch('/api/auth/logout',{method:'POST'});window.location.href='/login'}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+</script>
+</body>
+</html>

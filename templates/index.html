@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1c1410">
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<title>Jayam Gift Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-inner">
+    <div class="splash-logo"><span class="splash-l">J</span><span class="splash-text">ayam</span></div>
+    <div class="splash-tagline">Gifts that speak for you</div>
+    <div class="splash-bar"><div class="splash-fill"></div></div>
+  </div>
+  <div class="splash-particles" id="splash-particles"></div>
+</div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursor-dot"></div>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-logo">
+    <span class="logo-l">J</span><span class="logo-rest">ayam</span>
+    <span class="logo-sub">Gifts</span>
+  </div>
+  <div class="nav-links">
+    <span class="nav-link active" onclick="showShop()">Shop</span>
+    <span class="nav-link">Collections</span>
+    <span class="nav-link">About</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="/login" id="nav-login-btn" style="color:var(--sand);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--sand)'">Sign In</a>
+    <a href="/user" id="nav-account-btn" style="display:none;color:var(--sand);font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--sand)'">My Account</a>
+    <button class="cart-btn" onclick="toggleCart()">
+      <span class="cart-icon">🛍</span>
+      <span class="cart-label">Cart</span>
+      <span class="badge" id="cart-count">0</span>
+      <span class="cart-ripple"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- SHOP PAGE -->
+<div id="shop-page">
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+      <canvas id="hero-canvas"></canvas>
+    </div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">✦ Curated with care ✦</div>
+      <h1 class="hero-title">
+        <span class="hero-line" data-delay="0">Gifts that</span>
+        <span class="hero-line hero-italic" data-delay="150">whisper</span>
+        <span class="hero-line" data-delay="300">the right words</span>
+      </h1>
+      <p class="hero-sub">Extraordinary treasures for every occasion, every person, every feeling.</p>
+      <div class="hero-actions">
+        <button class="hero-cta" onclick="scrollToProducts()">
+          <span>Explore the shop</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="hero-cta-ghost" onclick="window.location.href='/login'">Sign in / Register</button>
+      </div>
+    </div>
+    <div class="hero-scroll-hint"><span>Scroll</span><div class="scroll-line"></div></div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span>Wellness ✦ Home & Living ✦ Food & Drink ✦ Accessories ✦ Stationery ✦ New Arrivals ✦ Sale ✦ Popular ✦ </span>
+      <span>Wellness ✦ Home & Living ✦ Food & Drink ✦ Accessories ✦ Stationery ✦ New Arrivals ✦ Sale ✦ Popular ✦ </span>
+    </div>
+  </div>
+
+  <div class="filters" id="filters-section">
+    <div class="filter-pills">
+      <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+      <button class="filter-btn" onclick="filterProducts('wellness', this)">Wellness</button>
+      <button class="filter-btn" onclick="filterProducts('home', this)">Home</button>
+      <button class="filter-btn" onclick="filterProducts('food', this)">Food &amp; Drink</button>
+      <button class="filter-btn" onclick="filterProducts('accessories', this)">Accessories</button>
+      <button class="filter-btn" onclick="filterProducts('stationery', this)">Stationery</button>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M10.5 10.5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input class="search-input" id="search" type="text" placeholder="Search gifts…" oninput="searchProducts(this.value)" />
+    </div>
+  </div>
+
+  <div class="products-section">
+    <div class="section-header">
+      <p class="section-title" id="section-label">All Gifts</p>
+      <span class="product-count" id="product-count"></span>
+    </div>
+    <div class="products-grid" id="products-grid">
+      <div class="skeleton-grid">${Array.from({length:6},(_,i)=>`<div class="skeleton-card" style="--d:${i*.08}s"></div>`).join('')}</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div id="checkout-section" style="display:none">
+  <div class="checkout-page">
+    <span class="back-link" onclick="showShop()">
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      Back to shop
+    </span>
+    <h2 class="checkout-title">Checkout</h2>
+    <div class="checkout-grid">
+      <div class="checkout-form-col">
+        <div class="form-section-title">Delivery Details</div>
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" id="fname" placeholder="Ada"/></div>
+          <div class="form-group"><label>Last Name</label><input type="text" id="lname" placeholder="Lovelace"/></div>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="email" placeholder="ada@example.com"/></div>
+        <div class="form-group"><label>Address</label><input type="text" id="address" placeholder="123 Garden Lane"/></div>
+        <div class="form-row">
+          <div class="form-group"><label>City</label><input type="text" id="city" placeholder="London"/></div>
+          <div class="form-group"><label>Postal Code</label><input type="text" id="zip" placeholder="SW1A 1AA"/></div>
+        </div>
+        <div class="form-group"><label>Gift Message (optional)</label><input type="text" id="gift-msg" placeholder="With love…"/></div>
+        <div class="form-section-title" style="margin-top:1.5rem">Payment</div>
+        <div class="payment-options" id="payment-options">
+          <div class="payment-opt active" onclick="selectPayment(this,'card')">💳 Card</div>
+          <div class="payment-opt" onclick="selectPayment(this,'paypal')">🅿 PayPal</div>
+          <div class="payment-opt" onclick="selectPayment(this,'apple')">🍎 Apple Pay</div>
+        </div>
+        <input type="hidden" id="payment" value="card">
+        <button class="submit-btn" onclick="placeOrder()">
+          <span id="submit-label">Place Order</span>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M10 4l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="checkout-summary-col">
+        <div class="order-summary" id="order-summary-box"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="success-section" style="display:none">
+  <div class="success-page">
+    <div class="success-ring">
+      <svg class="success-check" viewBox="0 0 80 80">
+        <circle class="check-circle" cx="40" cy="40" r="36" fill="none" stroke="#c9a96e" stroke-width="3"/>
+        <path class="check-path" d="M24 40l12 12 20-20" fill="none" stroke="#c9a96e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="success-confetti" id="success-confetti"></div>
+    <h2 class="success-title">Order Placed!</h2>
+    <p class="success-sub">Thank you — your gift is on its way.</p>
+    <p class="order-num" id="order-num"></p>
+    <p class="success-note">A confirmation has been sent to your email.</p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:2rem;flex-wrap:wrap">
+      <button class="continue-btn" onclick="showShop()">Continue Shopping</button>
+      <button class="continue-btn" style="background:var(--gold);color:var(--ink)" onclick="window.location.href='/user'">View My Orders</button>
+    </div>
+  </div>
+</div>
+
+<!-- CART PANEL -->
+<div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <div><h2>Your Cart</h2><span class="cart-subtitle" id="cart-subtitle">0 items</span></div>
+    <button class="close-btn" onclick="toggleCart()">
+      <svg width="20" height="20" viewBox="0 0 20 20"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-footer" id="cart-footer" style="display:none">
+    <div class="cart-totals">
+      <div class="cart-total"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
+      <div class="cart-total"><span>Shipping</span><span class="free-tag">Free</span></div>
+      <div class="cart-total grand"><span>Total</span><span id="total">₹0.00</span></div>
+    </div>
+    <button class="checkout-btn" onclick="goCheckout()">
+      Proceed to Checkout
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-x" onclick="closeModal()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+    <div class="modal-left"><div class="modal-img" id="modal-img"></div><div class="modal-badges" id="modal-badges"></div></div>
+    <div class="modal-right">
+      <div class="modal-category" id="modal-category"></div>
+      <h2 id="modal-name"></h2>
+      <p class="modal-desc" id="modal-desc"></p>
+      <div class="modal-price-row">
+        <div class="modal-price" id="modal-price"></div>
+        <div class="modal-rating">★★★★★ <span>4.9</span></div>
+      </div>
+      <div class="modal-qty-row">
+        <span class="qty-label">Qty:</span>
+        <button class="mq-btn" onclick="modalQtyChange(-1)">−</button>
+        <span id="modal-qty">1</span>
+        <button class="mq-btn" onclick="modalQtyChange(1)">+</button>
+      </div>
+      <button class="modal-add" onclick="addFromModal()">
+        <span>Add to Cart</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 3h2l2.5 9h7l2-6H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="15" r="1" fill="currentColor"/><circle cx="14" cy="15" r="1" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-icon" id="toast-icon"></span><span id="toast-msg"></span></div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script>
+// Check auth state for nav
+fetch('/api/auth/me').then(r=>r.json()).then(me=>{
+  if(me._id){
+    document.getElementById('nav-login-btn').style.display='none';
+    document.getElementById('nav-account-btn').style.display='inline';
+    document.getElementById('nav-account-btn').textContent=me.name.split(' ')[0];
+    // Prefill checkout
+    document.getElementById('fname').value=me.name.split(' ')[0]||'';
+    document.getElementById('lname').value=me.name.split(' ').slice(1).join(' ')||'';
+    document.getElementById('email').value=me.email||'';
+  }
+});
+</script>
+</body>
+</html>
