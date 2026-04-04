@@ -71,13 +71,27 @@ def seed():
             {"name":"Gratitude Cards",     "emoji":"💌", "desc":"50 beautifully illustrated prompt cards to deepen connections.",   "price":16,"category":"stationery","tag":"",       "bg":"#fff0f0","stock":80},
             {"name":"Gold Ear Cuff Set",   "emoji":"✨", "desc":"Three mismatched 14k gold-plated cuffs. No piercing required.",    "price":44,"category":"accessories","tag":"sale",   "bg":"#fdf8e1","stock":16,"sale_price":34},
         ])
-    if users_col.count_documents({}) == 0:
-        users_col.insert_many([
-            {"name":"Admin","email":"admin@jaya.com","password":hash_pw("admin123"),"role":"admin","created_at":datetime.datetime.utcnow()},
-            {"name":"Alice","email":"alice@example.com","password":hash_pw("alice123"),"role":"user","created_at":datetime.datetime.utcnow()},
-            {"name":"Bob","email":"bob@example.com","password":hash_pw("bob123"),"role":"user","created_at":datetime.datetime.utcnow()},
-        ])
-        print("✅ Seeded products + users")
+    def ensure_user(email, name, password, role):
+        user = users_col.find_one({"email": email})
+        if not user:
+            users_col.insert_one({
+                "name": name,
+                "email": email,
+                "password": hash_pw(password),
+                "role": role,
+                "created_at": datetime.datetime.utcnow(),
+            })
+        elif user.get("role") != role or user.get("password") != hash_pw(password):
+            users_col.update_one({"_id": user["_id"]}, {"$set": {
+                "name": name,
+                "password": hash_pw(password),
+                "role": role,
+            }})
+
+    ensure_user("admin@jaya.com", "Admin", "admin123", "admin")
+    ensure_user("alice@example.com", "Alice", "alice123", "user")
+    ensure_user("bob@example.com", "Bob", "bob123", "user")
+    print("✅ Seeded products + users")
 
 # ── Auth Pages ─────────────────────────────────────────
 @app.route("/login")
