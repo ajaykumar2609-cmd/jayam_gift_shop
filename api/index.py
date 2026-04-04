@@ -51,14 +51,33 @@ def login_required(f):
     from functools import wraps
     @wraps(f)
     def decorated(*args, **kwargs):
+        # Check session first, then JWT cookie
         if not session.get("user_id"):
-            return redirect(url_for("login_page"))
+            token = request.cookies.get("authToken")
+            if token:
+                try:
+                    data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+                    session["user_id"] = data["user_id"]
+                except Exception:
+                    return redirect(url_for("login_page"))
+            else:
+                return redirect(url_for("login_page"))
         return f(*args, **kwargs)
     return decorated
 def admin_required(f):
     from functools import wraps
     @wraps(f)
     def decorated(*args, **kwargs):
+        if not session.get("user_id"):
+            token = request.cookies.get("authToken")
+            if token:
+                try:
+                    data = jwt.decode(token, app.secret_key, algorithms=["HS256"])
+                    session["user_id"] = data["user_id"]
+                except Exception:
+                    return redirect(url_for("login_page"))
+            else:
+                return redirect(url_for("login_page"))
         u = current_user()
         if not u or u.get("role") != "admin":
             return redirect(url_for("login_page"))
@@ -165,12 +184,16 @@ def login():
     token = jwt.encode({"user_id": str(u["_id"]), "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)}, app.secret_key, algorithm="HS256")
     session["user_id"] = str(u["_id"])  # for pages
     redirect_url = "/admin" if u["role"] == "admin" else "/user"
-    return jsonify({"success": True, "redirect": redirect_url, "role": u["role"], "token": token})
+    resp = jsonify({"success": True, "redirect": redirect_url, "role": u["role"], "token": token})
+    resp.set_cookie("authToken", token, max_age=86400, httponly=False, samesite="Lax")
+    return resp
 
 @app.route("/api/auth/logout", methods=["POST"])
 def logout():
     session.clear()
-    return jsonify({"success": True, "redirect": "/login"})
+    resp = jsonify({"success": True, "redirect": "/login"})
+    resp.delete_cookie("authToken")
+    return resp
 
 @app.route("/api/auth/me")
 def me():
@@ -469,4 +492,4 @@ def place_order():
 seed()
 
 # Vercel WSGI handler
-from vercel_python_wsgi import handler
+handler = app
