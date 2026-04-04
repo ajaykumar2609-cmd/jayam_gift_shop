@@ -3,7 +3,10 @@ from pymongo import MongoClient
 from bson import ObjectId
 import os, datetime, random, uuid, hashlib, jwt
 
-app = Flask(__name__)
+import os
+template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'templates'))
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static'))
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.secret_key = "jaya_secret_2024"
 
 MONGO_URI    = os.environ.get("MONGO_URI", "mongodb+srv://ajaykumardeveloper12_db_user:Momdad%40223@ajay.cfzt5ua.mongodb.net/?appName=ajay")
@@ -493,3 +496,6 @@ seed()
 
 # Vercel WSGI handler
 handler = app
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000, use_reloader=False)
