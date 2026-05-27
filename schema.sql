@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 INSERT IGNORE INTO users (name, email, password, role) VALUES
 ('Admin',  'admin@jaya.com',      '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'admin'),
 ('Alice',  'alice@example.com',   '723a0d17ecafd5b95d3d2e0fb7e80c3e4e9d1d62e2494a6f40e1d6d66e5db5a6', 'user'),
-('Bob',    'bob@example.com',     '2c624232cdd221771294dfbb310acbc8e1c7f785c33e9843d2e2e0e2e3e4e5e6', 'user');
+('Bob',    'bob@example.com',     '8d059c3640b97180dd2ee453e20d34ab0cb0f2eccbe87d01915a8e578a202b11', 'user');
 
 -- Products
 INSERT IGNORE INTO products (name, emoji, description, price, sale_price, category, tag, bg_color, stock) VALUES

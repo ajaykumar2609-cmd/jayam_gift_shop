@@ -302,8 +302,8 @@ canvas#donut{flex-shrink:0}
     <input type="hidden" id="status-oid" />
     <div class="form-group"><label>Status</label>
       <select id="status-select">
-        <option value="pending">Pending</option>
         <option value="confirmed">Confirmed</option>
+        <option value="processing">Processing</option>
         <option value="shipped">Shipped</option>
         <option value="delivered">Delivered</option>
         <option value="cancelled">Cancelled</option>
@@ -388,7 +388,7 @@ function renderRecentOrders(orders){
       <td>${o.customer?.first_name||''} ${o.customer?.last_name||''}</td>
       <td>${(o.items||[]).length} item(s)</td>
       <td>₹${(o.total||0).toFixed(2)}</td>
-      <td><span class="status-pill status-${o.status||'pending'}">${o.status||'pending'}</span></td>
+      <td><span class="status-pill status-${o.status||'confirmed'}">${o.status||'confirmed'}</span></td>
       <td style="color:var(--ink-light);font-size:.8rem">${(o.created_at||'').slice(0,10)}</td>
     </tr>`).join('');
 }
@@ -420,9 +420,9 @@ function renderOrdersTable(orders){
       <td>${o.customer?.email||''}</td>
       <td>${(o.items||[]).length}</td>
       <td>₹${(o.total||0).toFixed(2)}</td>
-      <td><span class="status-pill status-${o.status||'pending'}">${o.status||'pending'}</span></td>
+      <td><span class="status-pill status-${o.status||'confirmed'}">${o.status||'confirmed'}</span></td>
       <td style="font-size:.8rem;color:var(--ink-light)">${(o.created_at||'').slice(0,10)}</td>
-      <td><button class="action-btn" onclick="openStatusModal('${o.id}','${o.status||'pending'}')">Edit</button></td>
+      <td><button class="action-btn" onclick="openStatusModal('${o.id}','${o.status||'confirmed'}')">Edit</button></td>
     </tr>`).join('');
 }
 function filterOrders(q){

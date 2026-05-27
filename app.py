@@ -162,7 +162,11 @@ def me():
     u = current_user()
     if not u:
         return jsonify({"error": "Not logged in"}), 401
-    return jsonify(safe_user(u))
+    payload = safe_user(u)
+    if payload:
+        # Keep legacy key for frontend compatibility.
+        payload["_id"] = payload.get("id")
+    return jsonify(payload)
 
 
 # ─── SHOP (PUBLIC) ────────────────────────────────
@@ -238,6 +242,16 @@ def admin_orders():
     for o in orders:
         o["created_at"] = str(o["created_at"])[:19]
         o["total"] = float(o["total"])
+        # Keep legacy nested fields expected by the current admin template.
+        o["customer"] = {
+            "first_name": (o.get("customer_name") or "").split(" ")[0],
+            "last_name": " ".join((o.get("customer_name") or "").split(" ")[1:]),
+            "email": o.get("customer_email", ""),
+        }
+        o["items"] = query(
+            "SELECT * FROM order_items WHERE order_id=%s",
+            (o["id"],), fetchall=True
+        ) or []
     return jsonify(orders)
 
 
@@ -260,6 +274,8 @@ def admin_products():
         r["price"] = float(r["price"])
         if r["sale_price"] is not None:
             r["sale_price"] = float(r["sale_price"])
+        r["desc"] = r.get("description", "")
+        r["bg"] = r.get("bg_color", "#faf7f2")
     return jsonify(rows)
 
 
@@ -393,6 +409,8 @@ def get_products():
             r["sale_price"] = float(r["sale_price"])
         # Frontend expects "desc" key (MongoDB version used "desc")
         r["desc"] = r.pop("description", "")
+        r["bg"] = r.get("bg_color", "#faf7f2")
+        r["_id"] = r["id"]
     return jsonify(rows)
 
 
@@ -405,6 +423,7 @@ def get_product(pid):
     if p["sale_price"] is not None:
         p["sale_price"] = float(p["sale_price"])
     p["desc"] = p.pop("description", "")
+    p["bg"] = p.get("bg_color", "#faf7f2")
     # Keep "_id" alias for frontend compatibility
     p["_id"] = p["id"]
     return jsonify(p)
@@ -432,6 +451,7 @@ def get_related_products(pid):
         if r["sale_price"] is not None:
             r["sale_price"] = float(r["sale_price"])
         r["desc"] = r.pop("description", "")
+        r["bg"] = r.get("bg_color", "#faf7f2")
         r["_id"]  = r["id"]
     return jsonify(related)
 
@@ -453,6 +473,7 @@ def get_cart():
             item["sale_price"] = float(item["sale_price"])
         item["_id"]  = item["id"]
         item["desc"] = item.pop("description", "")
+        item["bg"] = item.get("bg_color", "#faf7f2")
         result.append(item)
     return jsonify(result)
 
